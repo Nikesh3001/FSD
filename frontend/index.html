@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura | Premium Real Estate</title>
+  <meta name="description" content="Explore an elite curation of modern penthouses, luxury villas, and prime plots designed for the future.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- GSAP Animation Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- Our Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Animated CSS Background Blobs -->
+  <div id="css-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-building-columns"></i> Aura
+    </a>
+    <div class="nav-links">
+      <a href="#" class="nav-link active" data-filter="all">Explore</a>
+      <a href="#" class="nav-link" data-filter="favorites">
+        <i class="fa-regular fa-heart"></i> Favorites
+      </a>
+      <a href="#" class="btn btn-primary" id="add-property-btn">
+        <i class="fa-solid fa-plus"></i> List Property
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <h1 class="gradient-text" id="hero-title">Discover Your Next<br>Extraordinary Space.</h1>
+      <p id="hero-subtitle">Explore an elite curation of modern penthouses, luxury villas,
+        and prime plots designed for the future.</p>
+    </div>
+  </header>
+
+  <!-- Search & Filters -->
+  <div class="search-container glass-panel" id="search-bar">
+    <div class="filter-group">
+      <i class="fa-solid fa-location-dot"></i>
+      <input type="text" id="search-input" placeholder="Search by location or name...">
+    </div>
+    <div class="filter-group">
+      <i class="fa-solid fa-building"></i>
+      <select id="type-filter">
+        <option value="">Any Type</option>
+        <option value="Apartment">Apartment</option>
+        <option value="Villa">Villa</option>
+        <option value="Plot">Plot</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <i class="fa-solid fa-wallet"></i>
+      <select id="price-filter">
+        <option value="">Any Price</option>
+        <option value="10000000">Under ₹1 Cr</option>
+        <option value="20000000">Under ₹2 Cr</option>
+        <option value="50000000">Under ₹5 Cr</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <main class="main-content">
+    <div class="section-header">
+      <h2 id="section-title">Exclusive Listings</h2>
+      <span id="property-count" class="count-badge"></span>
+    </div>
+
+    <div class="properties-grid" id="properties-grid">
+      <!-- Properties are added here by app.js -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>© 2025 Aura Real Estate &nbsp;·&nbsp; Built with <i class="fa-solid fa-heart" style="color:#8b5cf6;"></i> &nbsp;·&nbsp; Frontend Only</p>
+  </footer>
+
+  <!-- Add Property Modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h2>List a New Property</h2>
+        <button class="close-modal" id="close-modal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="add-property-form">
+        <div class="form-group">
+          <label for="p-title">Property Title</label>
+          <input type="text" id="p-title" class="form-input" required placeholder="e.g. Modern Edge Apartment">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="p-price">Price (₹)</label>
+            <input type="number" id="p-price" class="form-input" required min="100000" placeholder="e.g. 5000000">
+          </div>
+          <div class="form-group">
+            <label for="p-location">Location</label>
+            <input type="text" id="p-location" class="form-input" required placeholder="e.g. Mumbai">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="p-type">Property Type</label>
+            <select id="p-type" class="form-input" required>
+              <option value="Apartment">Apartment</option>
+              <option value="Villa">Villa</option>
+              <option value="Plot">Plot</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="p-area">Area (sqft)</label>
+            <input type="number" id="p-area" class="form-input" required min="100" placeholder="e.g. 1500">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="p-beds">Bedrooms</label>
+            <input type="number" id="p-beds" class="form-input" value="2" min="0">
+          </div>
+          <div class="form-group">
+            <label for="p-baths">Bathrooms</label>
+            <input type="number" id="p-baths" class="form-input" value="1" min="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="p-image">Image URL <span style="color:var(--text-muted); font-weight:400;">(optional)</span></label>
+          <input type="url" id="p-image" class="form-input" placeholder="https://...">
+        </div>
+
+        <button type="submit" class="btn btn-primary submit-btn">
+          <i class="fa-solid fa-paper-plane"></i> Publish Listing
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Data Service (localStorage) -->
+  <script src="data.js"></script>
+  <!-- Main App Logic -->
+  <script src="app.js"></script>
+
+</body>
+
+</html>

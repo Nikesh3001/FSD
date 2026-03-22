@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Details | Aura</title>
+    <meta name="description" content="View full details, features, and pricing for this exclusive property on Aura Real Estate.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Our Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Animated Blob Background -->
+    <div id="css-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar" style="background: rgba(15,16,22,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.07);">
+        <a href="index.html" class="logo">
+            <i class="fa-solid fa-building-columns"></i> Aura
+        </a>
+        <div class="nav-links">
+            <a href="index.html" class="btn btn-glass" style="font-size:0.9rem; padding: 0.5rem 1.2rem;">
+                <i class="fa-solid fa-arrow-left"></i> Back to Listings
+            </a>
+        </div>
+    </nav>
+
+    <!-- Property content injected here by JavaScript -->
+    <div id="detail-content" style="min-height: 80vh; padding-top: 80px;">
+        <div class="empty-state" style="margin: 6rem 5%;">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <h3>Loading property...</h3>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>© 2025 Aura Real Estate &nbsp;·&nbsp; Built with <i class="fa-solid fa-heart" style="color:#8b5cf6;"></i> &nbsp;·&nbsp; Frontend Only</p>
+    </footer>
+
+    <!-- Data Service (localStorage) -->
+    <script src="data.js"></script>
+
+    <!-- Property Detail Logic -->
+    <script>
+        // Format price as Indian currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        // Toast notification
+        function showToast(message) {
+            var old = document.querySelector('.toast');
+            if (old) old.remove();
+
+            var toast = document.createElement('div');
+            toast.className = 'toast';                       // ← fixed: was 'toast class-panel'
+            toast.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>' + message + '</span>';
+            document.body.appendChild(toast);
+
+            setTimeout(function() { toast.classList.add('show'); }, 50);
+            setTimeout(function() {
+                toast.classList.remove('show');
+                setTimeout(function() { toast.remove(); }, 400);
+            }, 3000);
+        }
+
+        // Toggle favorite from the detail page
+        window.toggleDetailFav = function(event, id) {
+            var isFav = DataService.toggleFavorite(id);
+            var btn   = event.currentTarget;
+
+            if (isFav) {
+                btn.innerHTML = '<i class="fa-solid fa-heart" style="color:#ff3366;"></i> Saved to Favorites';
+                showToast('\u2764\ufe0f Added to Favorites');
+            } else {
+                btn.innerHTML = '<i class="fa-regular fa-heart"></i> Add to Favorites';
+                showToast('Removed from Favorites');
+            }
+        };
+
+        // Navbar shrink on scroll
+        window.addEventListener('scroll', function() {
+            // Already styled as scrolled by default on detail page
+        });
+
+        // Run when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            var params   = new URLSearchParams(window.location.search);
+            var id       = params.get('id');
+            var container = document.getElementById('detail-content');
+
+            // No ID given → show error
+            if (!id) {
+                container.innerHTML =
+                    '<div class="empty-state" style="margin: 6rem 5%;">' +
+                        '<i class="fa-solid fa-triangle-exclamation"></i>' +
+                        '<h3>Property Not Found</h3>' +
+                        '<p>No property ID was provided in the URL.</p>' +
+                        '<a href="index.html" class="btn btn-primary" style="margin-top:1.5rem;">Go Back Home</a>' +
+                    '</div>';
+                return;
+            }
+
+            var property = DataService.getProperty(id);
+
+            // Property not in storage → show error
+            if (!property) {
+                container.innerHTML =
+                    '<div class="empty-state" style="margin: 6rem 5%;">' +
+                        '<i class="fa-solid fa-house-circle-xmark"></i>' +
+                        '<h3>Property Not Found</h3>' +
+                        '<p>This property may have been removed or the link is incorrect.</p>' +
+                        '<a href="index.html" class="btn btn-primary" style="margin-top:1.5rem;">Go Back Home</a>' +
+                    '</div>';
+                return;
+            }
+
+            // Update page title
+            document.title = property.title + ' | Aura';
+
+            var isFav = DataService.isFavorite(property.id);
+
+            // Key features section
+            var featuresHTML =
+                '<div class="feature-item">' +
+                    '<i class="fa-solid fa-vector-square"></i>' +
+                    '<div><span>Area</span><strong>' + property.area + ' sqft</strong></div>' +
+                '</div>';
+
+            if (property.type !== 'Plot') {
+                featuresHTML +=
+                    '<div class="feature-item">' +
+                        '<i class="fa-solid fa-bed"></i>' +
+                        '<div><span>Bedrooms</span><strong>' + property.bedrooms + '</strong></div>' +
+                    '</div>' +
+                    '<div class="feature-item">' +
+                        '<i class="fa-solid fa-bath"></i>' +
+                        '<div><span>Bathrooms</span><strong>' + property.bathrooms + '</strong></div>' +
+                    '</div>';
+            }
+
+            featuresHTML +=
+                '<div class="feature-item">' +
+                    '<i class="fa-solid fa-building"></i>' +
+                    '<div><span>Type</span><strong>' + property.type + '</strong></div>' +
+                '</div>' +
+                '<div class="feature-item">' +
+                    '<i class="fa-solid fa-circle-check"></i>' +
+                    '<div><span>Status</span><strong>Ready to Move</strong></div>' +
+                '</div>';
+
+            // Inject the full property detail layout
+            container.innerHTML =
+                '<div class="details-hero">' +
+                    '<img src="' + property.image + '" alt="' + property.title + '" class="details-image">' +
+                    '<div class="details-header">' +
+                        '<div class="property-type" style="position:relative;display:inline-block;margin-bottom:1rem;transform:none;top:0;left:0;">' + property.type + '</div>' +
+                        '<h1 class="details-title gradient-text">' + property.title + '</h1>' +
+                        '<div class="property-location" style="font-size:1.1rem;">' +
+                            '<i class="fa-solid fa-location-dot"></i> ' + property.location +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+
+                '<div class="details-container">' +
+
+                    // Left column: description & features
+                    '<div class="details-main">' +
+                        '<div class="glass-panel details-info">' +
+                            '<div class="info-block">' +
+                                '<h3>Overview</h3>' +
+                                '<p>' + property.description + '</p>' +
+                            '</div>' +
+                            '<div class="info-block">' +
+                                '<h3>Key Features</h3>' +
+                                '<div class="features-grid">' + featuresHTML + '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+
+                    // Right column: price & actions
+                    '<div class="details-sidebar">' +
+                        '<div class="glass-panel price-card">' +
+                            '<div class="price">' + formatCurrency(property.price) + '</div>' +
+                            '<p class="price-label">Listed Price</p>' +
+                            '<div class="action-buttons">' +
+                                '<button class="btn btn-primary" onclick="showToast(\'📞 Contact form coming soon!\')">' +
+                                    '<i class="fa-solid fa-envelope"></i> Contact Dealer' +
+                                '</button>' +
+                                '<button class="btn btn-glass" onclick="toggleDetailFav(event, \'' + property.id + '\')">' +
+                                    (isFav
+                                        ? '<i class="fa-solid fa-heart" style="color:#ff3366;"></i> Saved to Favorites'
+                                        : '<i class="fa-regular fa-heart"></i> Add to Favorites') +
+                                '</button>' +
+                                '<a href="index.html" class="btn btn-glass">' +
+                                    '<i class="fa-solid fa-arrow-left"></i> All Listings' +
+                                '</a>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+
+                '</div>';
+
+            // Animate in with GSAP
+            if (typeof gsap !== 'undefined') {
+                gsap.from('.details-hero',    { opacity: 0, duration: 1.2, ease: 'power2.out' });
+                gsap.from('.details-header',  { y: 50, opacity: 0, duration: 0.9, delay: 0.3, ease: 'back.out(1.5)' });
+                gsap.from('.details-info',    { x: -30, opacity: 0, duration: 0.9, delay: 0.5, ease: 'power3.out' });
+                gsap.from('.price-card',      { x: 30,  opacity: 0, duration: 0.9, delay: 0.6, ease: 'power3.out' });
+            }
+        });
+    </script>
+
+</body>
+</html>
